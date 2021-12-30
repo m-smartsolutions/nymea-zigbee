@@ -91,12 +91,14 @@ public:
 
     // Only available if fetched
     QList<ZigbeeDeviceProfile::BindingTableListRecord> bindingTableRecords() const;
+    QList<ZigbeeDeviceProfile::NeighborTableListRecord> neighborTableRecords() const;
 
     // This method starts the node initialization phase (read descriptors and endpoints)
     void startInitialization();
 
     ZigbeeReply *removeAllBindings();
     ZigbeeReply *readBindingTableEntries();
+    ZigbeeReply *updateNeighborTableEntries();
 
 private:
     ZigbeeNode(ZigbeeNetwork *network, quint16 shortAddress, const ZigbeeAddress &extendedAddress, QObject *parent = nullptr);
@@ -125,6 +127,8 @@ private:
     bool m_powerDescriptorAvailable = false;
 
     QList<ZigbeeDeviceProfile::BindingTableListRecord> m_bindingTableRecords;
+    QList<ZigbeeDeviceProfile::NeighborTableListRecord> m_neighborTableRecords;
+    QList<ZigbeeDeviceProfile::NeighborTableListRecord> m_temporaryNeighborTableRecords;
 
     void setState(State state);
     void setReachable(bool reachable);
@@ -139,6 +143,7 @@ private:
     void initEndpoint(quint8 endpointId);
 
     void removeNextBinding(ZigbeeReply *reply);
+    void readNextNeigborTableRecords(ZigbeeReply *reply, quint8 startIndex = 0);
 
     void setupEndpointInternal(ZigbeeNodeEndpoint *endpoint);
 
@@ -161,6 +166,7 @@ signals:
     void versionChanged(const QString &version);
     void reachableChanged(bool reachable);
     void bindingTableRecordsChanged();
+    void neighborTableRecordsChanged();
     void clusterAdded(ZigbeeCluster *cluster);
     void endpointClusterAttributeChanged(ZigbeeNodeEndpoint *endpoint, ZigbeeCluster *cluster, const ZigbeeClusterAttribute &attribute);
 
